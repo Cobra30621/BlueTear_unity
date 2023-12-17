@@ -1,0 +1,436 @@
+
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Video;
+using System.Threading;
+
+
+public class video : MonoBehaviour
+{
+    public AudioSource ds, itro, ready, bt, People, Seagull;
+    public VideoPlayer vSun, vLight;
+    public RawImage rSun, rLight, rSea, rBlueTear;
+    public string Stage;
+    public int cFrame, maxFrame, count, lCount;
+    public bool reverse, bLight, change;
+    public Transform Camera, iWind;
+    public ParticleSystem pWind;
+    public Text tStage, tcFrame, tCount, tlCount, tMove;
+    public GameObject[] info = new GameObject[10];
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        vSun.frame = 0;
+        maxFrame = 599;
+        count = 0; lCount = 0;
+        reverse = false; bLight = false; change = false;
+        vSun.enabled = true; vLight.enabled = true;
+        vSun.playbackSpeed = 1f; vLight.playbackSpeed = 1f;
+        vSun.Play(); vLight.Play();
+        Stage = "Init";
+        itro.Play(); itro.volume = 0;
+        ready.Play(); ready.volume = 0;
+        bt.Play(); bt.volume = 0;
+        ds.Play(); ds.volume = 0;
+        Seagull.Play(); Seagull.volume = 0;
+        People.Play(); People.volume = 0;
+        pWind.Stop();
+    }
+    void FixedUpdate()
+    {
+        tStage.text = Stage.ToString();
+        tcFrame.text = cFrame.ToString();
+        tCount.text = count.ToString();
+
+        tlCount.text = lCount.ToString();
+        if (Stage == "Init")
+        {
+            if (vSun.frame <= 150) 
+            {
+                ds.volume = vSun.frame / 150f;
+                Seagull.volume = vSun.frame / 150f;
+                vSun.playbackSpeed = 1f;
+            }
+            else
+            {
+                vSun.playbackSpeed = 0f;
+                info[4].SetActive(true);
+                Stage = "Sun";
+            }
+            
+        }
+        if (Stage == "Sun")
+        {
+            if (!change)
+            {
+                if (Input.GetKey(KeyCode.D)||(tMove.text== "SunRight")) //SunRight
+                {
+                    Sun(1);
+                }
+                else if (Input.GetKey(KeyCode.A)||(tMove.text == "SunLeft")) //SunLeft
+                {
+                    Sun(-1);
+                }
+                else
+                {
+                    Sun(0);
+                }
+                if ((vSun.frame == 299)|| (vSun.frame == 300))
+                {
+                    if (count < 256)
+                    {
+                        count++;
+                        Seagull.volume = 1 - (count / 256f);
+                    }
+                    else if(count >= 256)
+                    {
+                        change = true;
+                        vSun.frame = 0;
+
+                    }
+                }
+                else
+                {
+                    if (count > 0)
+                    {
+                        count--;
+                        Seagull.volume = 1 - (count / 256f);
+                    }
+                }
+
+            }
+            else
+            {
+                if (count>0)
+                {
+                    info[4].SetActive(false);
+                    info[1].SetActive(true);
+                    Color color = rLight.color;
+                    color.a = 1-((1/ 256f) * count);
+                    rLight.color = color;
+                    People.volume = 1 - ((1 / 256f) * count);
+                    count--;
+                }
+                else
+                {
+                    change = false;
+                    Color c = rSea.color;
+                    c.a = 255;
+                    rSea.color = c;
+                    info[5].SetActive(true);
+                    lCount = 0;
+                    Stage = "Light";
+                }
+            }
+        }
+        else if (Stage=="Light")
+        {
+            if (!change)
+            {
+                if (Input.GetKey(KeyCode.W)||(tMove.text == "CloseLight")) //CloseLight
+                {
+                    bLight = false;
+                }
+                else
+                {
+                    bLight = true;
+                }
+                Light(bLight);
+
+                if (rLight.color.a == 0)
+                {
+                    if (count < 256)
+                    {
+                        count++;
+                        ds.volume = vSea(1 - ((1 / 256f) * count));
+                        People.volume = (1 - ((1 / 256f) * count));
+
+                    }
+                    else if (count >= 256)
+                    {
+                        ds.volume = vSea(0);
+                        itro.volume = 0;
+                        ready.volume = 0;
+                        itro.Play();
+                        ready.Play();
+                        change = true;
+                    }
+                }
+                else
+                {
+                    if (count > 0)
+                    {
+                        count--;
+                        ds.volume = vSea(1 - ((1 / 256f) * count));
+                        People.volume = (1 - ((1 / 256f) * count));
+                    }
+                }
+            }
+            else
+            {
+                if (count > 0)
+                {
+                    info[5].SetActive(false);
+                    info[2].SetActive(true);
+                    Color color = rSun.color;
+                    color.a = (1 / 256f) * count;
+                    itro.volume = 1-(1 / 256f) * count;
+                    rSun.color = color;
+                    count--;
+                }
+                else
+                {
+                    info[6].SetActive(true);
+                    lCount = 0;
+                    change = false;
+                    pWind.Play();
+                    Stage = "Wind";
+                }
+
+            }
+        }
+        else if (Stage == "Wind")
+        {
+            if (!change)
+            {
+                if (itro.isPlaying == false)
+                {
+                    itro.Play();
+                    ready.Play();
+                }
+                if (lCount < 768)
+                {
+                    lCount++;
+                }
+                else
+                {
+                    info[6].SetActive(false);
+                    info[7].SetActive(true);
+                }
+                if (Input.GetKey(KeyCode.D) || (tMove.text == "WindRight")) //WindRight
+                {
+                    Wind(1);
+                }
+                else if (Input.GetKey(KeyCode.A) || (tMove.text == "WindLeft")) //WindLeft
+                {
+                    Wind(-1);
+                }
+                else if ((Input.GetKey(KeyCode.W) || (tMove.text == "Pray")) && (Mathf.Abs(Camera.position.x) < 10) && (info[7].active==true)) //Pray
+                {
+                    count += 1;
+                    if (count < 256)
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        info[7].SetActive(false);
+                        info[9].SetActive(true);
+                        change = true;
+                    }
+                }
+                else
+                {
+                    if (count > 0)
+                    {
+                        count--;
+                    }
+                    Wind(0);
+                }
+            }
+            else
+            {
+                if (ready.isPlaying == true)
+                {
+                    ready.volume = 1;
+                    itro.volume = 0;
+                }
+                else
+                {
+                    if (bt.isPlaying == false)
+                    {
+                        pWind.Stop();
+                        bt.Play();
+                        bt.volume = 1;
+                    }
+                    if (count > 0)
+                    {
+                        info[3].SetActive(true);
+                        info[9].SetActive(false);
+                        Color color = rSea.color;
+                        color.a = 0.6f + ((1 / 256f) * count) * 0.4f;
+                        rSea.color = color;
+                        count--;
+                    }
+                    else
+                    {
+                        change = false;
+                        info[8].SetActive(true);
+                        Stage = "BlueTear";
+                        
+                    }
+                }
+            }
+        }
+        else if (Stage == "BlueTear")
+        {
+            if (!change)
+            {
+                if (Input.GetKey(KeyCode.W) || (tMove.text == "WindForward"))//WindForward
+                {
+                    BlueTear(true);
+                }
+                else
+                {
+                    BlueTear(false);
+                }
+                if (count < 2300)
+                {
+                    count++;
+                }
+                else
+                {
+                    change = true;
+                }
+            }
+            else
+            {
+                if (count > 0)
+                {
+                    info[8].SetActive(false);
+                    BlueTear(false);
+                    Color color = rSun.color;
+                    color.a = 1f - (count / 1000f);
+                    rSun.color = color;
+                    count -= 5;
+                }
+                else
+                {
+                    info[0].SetActive(true);
+                    change = false;
+                    Stage = "Init";
+                }
+            }
+        }
+    }
+
+    void Sun(int kInt)
+    {
+        cFrame = (int)vSun.frame;
+        if (kInt==1)
+        {
+            if (reverse)
+            { 
+                vSun.frame = maxFrame - cFrame;
+                
+                reverse = false;
+            }
+
+            if ((cFrame<0) || (cFrame >= 299))
+            {
+                vSun.playbackSpeed = 0f;
+            }
+            else
+            {
+                vSun.playbackSpeed = 1f;
+            }
+            
+        }
+        else if (kInt==-1)
+        {
+            if (!reverse)
+            {
+                vSun.frame = maxFrame - cFrame;
+                
+                reverse = true;
+            }
+            if ((cFrame < 299) || (cFrame >= 600))
+            {
+                vSun.playbackSpeed = 0f;
+            }
+            else
+            {
+                vSun.playbackSpeed = 1f;
+            }
+
+        }
+        else if (kInt==0)
+        {
+            vSun.playbackSpeed = 0f;
+        }
+        else if (kInt == 2)
+        {
+            vSun.frame = 0;
+        }
+        
+    }
+    void Light(bool open)
+    {
+        Color cLight = rLight.color;
+        if (open)
+        {
+            lCount--;
+        }
+        else
+        {
+            lCount++;
+        }
+        lCount = Mathf.Clamp(lCount, 0, 255);
+        cLight.a = 1-(lCount / 255f);
+        rLight.color = cLight;
+    }
+    void Wind(int dir)
+    {
+        float x = Camera.position.x;
+        float d = Mathf.Abs(Camera.position.x);
+        iWind.LookAt(Camera, Vector3.up);
+        if (dir==1)
+        {
+            x+=2f;
+        }
+        else if (dir==-1)
+        {
+            x -= 2f;
+        }
+        else if (dir==0)
+        {
+            if (x > 0)
+            {
+                x -= d/50f;
+            }
+            else if (x < 0)
+            {
+                x += d/50f;
+            }
+        }
+        x = Mathf.Clamp(x, -150f, 150f);
+        Camera.position = new Vector3(x, Camera.position.y, Camera.position.z);
+    }
+    void BlueTear(bool zoom)
+    {
+        float z = Camera.position.z;
+        float x = Camera.rotation.eulerAngles.x;
+        float d = Mathf.Abs(Camera.position.z+150f);
+        float a  = Mathf.Abs(Camera.eulerAngles.x -1f);
+        if (zoom)
+        {
+            z += d / 50f;
+            x -= a / 50f;
+        }
+        else
+        {
+            z -= d / 50f;
+            x += a / 50f;
+        }
+        z = Mathf.Clamp(z, -800f, -200f);
+        x = Mathf.Clamp(x, -5f, 0f);
+        Camera.position = new Vector3(Camera.position.x, Camera.position.y, z);
+        Camera.eulerAngles = new Vector3(x, Camera.eulerAngles.y, Camera.eulerAngles.z);
+    }
+    float vSea(float v)    {
+        return (0.05f) + (v / 0.95f);
+    }
+
+}
