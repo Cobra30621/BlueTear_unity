@@ -15,7 +15,7 @@ public class step : MonoBehaviour
         c.a = 0;
         r.color = c;
         count = 0;
-        this.transform.position = new Vector3(0, -529, -1000);
+        this.transform.position = new Vector3(0, -529, 5);
     }
     void FixedUpdate()
     {
