@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace Script
 {
-    public class InfoDisplay : MonoBehaviour
+    public class StepDisplay : MonoBehaviour
     {
         public Text infoText;
 

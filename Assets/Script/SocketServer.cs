@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SocketServer : MonoBehaviour
@@ -20,6 +21,11 @@ public class SocketServer : MonoBehaviour
         server.Start();
         tMsg = "noPose";
         isRunning = true;
+
+        SceneManager.sceneLoaded += (s, e) =>
+        {
+            StopServer();
+        };
     }
 
     private void FixedUpdate()
@@ -47,8 +53,13 @@ public class SocketServer : MonoBehaviour
             }
         }
     }
-
+    
     private void OnApplicationQuit()
+    {
+        StopServer();
+    }
+
+    private void StopServer()
     {
         isRunning = false;
         if (server != null)

@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using System.Threading;
+using Script;
+using UnityEngine.Serialization;
 
 
 public class video : MonoBehaviour
@@ -13,11 +15,16 @@ public class video : MonoBehaviour
     public RawImage rSun, rLight, rSea, rBlueTear;
     public string Stage;
     public int cFrame, maxFrame, count, lCount;
+    public int initCounter = 0, initNeedCount = 3600; // if idle too long, back to init
     public bool reverse, bLight, change;
     public Transform Camera, iWind;
     public ParticleSystem pWind;
     public Text tStage, tcFrame, tCount, tlCount, tMove;
-    public GameObject[] info = new GameObject[10];
+    public GameObject[] info = new GameObject[4];
+
+    public StepDisplay stepDisplay;
+    public FadeController fadeController;
+    
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -38,260 +45,145 @@ public class video : MonoBehaviour
         People.Play(); People.volume = 0;
         pWind.Stop();
     }
+
+    #region Stage Handle
+
     void FixedUpdate()
     {
-        tStage.text = Stage.ToString();
-        tcFrame.text = cFrame.ToString();
-        tCount.text = count.ToString();
-
-        tlCount.text = lCount.ToString();
-        if (Stage == "Init")
+        UpdateDebugUI();
+        
+        switch (Stage)
         {
-            if (vSun.frame <= 150) 
+            case "Init":
+                HandleInitStage();
+                break;
+            case "Sun":
+                HandleSunStage();
+                break;
+            case "Light":
+                HandleLightStage();
+                break;
+            case "Wind":
+                HandleWindStage();
+                break;
+            case "BlueTear":
+                HandleBlueTearStage();
+                break;
+        }
+
+        HandleBackToInit();
+    }
+
+    
+
+    void HandleInitStage()
+    {
+        if (vSun.frame <= 150)
+        {
+            ds.volume = vSun.frame / 150f;
+            Seagull.volume = vSun.frame / 150f;
+            vSun.playbackSpeed = 1f;
+        }
+        else
+        {
+            vSun.playbackSpeed = 0f;
+            stepDisplay.Show("舉起右手比剪刀，控制日落");
+            Stage = "Sun";
+        }
+    }
+
+    void HandleSunStage()
+    {
+        if (!change)
+        {
+            if (Input.GetKey(KeyCode.D) || (tMove.text == "SunRight")) // SunRight
             {
-                ds.volume = vSun.frame / 150f;
-                Seagull.volume = vSun.frame / 150f;
-                vSun.playbackSpeed = 1f;
+                Sun(1);
+            }
+            else if (Input.GetKey(KeyCode.A) || (tMove.text == "SunLeft")) // SunLeft
+            {
+                Sun(-1);
             }
             else
             {
-                vSun.playbackSpeed = 0f;
-                info[4].SetActive(true);
-                Stage = "Sun";
+                Sun(0);
             }
-            
-        }
-        if (Stage == "Sun")
-        {
-            if (!change)
+            if (vSun.frame == 299 || vSun.frame == 300)
             {
-                if (Input.GetKey(KeyCode.D)||(tMove.text== "SunRight")) //SunRight
+                if (count < 256)
                 {
-                    Sun(1);
+                    count++;
+                    Seagull.volume = 1 - (count / 256f);
                 }
-                else if (Input.GetKey(KeyCode.A)||(tMove.text == "SunLeft")) //SunLeft
+                else if (count >= 256)
                 {
-                    Sun(-1);
-                }
-                else
-                {
-                    Sun(0);
-                }
-                if ((vSun.frame == 299)|| (vSun.frame == 300))
-                {
-                    if (count < 256)
-                    {
-                        count++;
-                        Seagull.volume = 1 - (count / 256f);
-                    }
-                    else if(count >= 256)
-                    {
-                        change = true;
-                        vSun.frame = 0;
-
-                    }
-                }
-                else
-                {
-                    if (count > 0)
-                    {
-                        count--;
-                        Seagull.volume = 1 - (count / 256f);
-                    }
-                }
-
-            }
-            else
-            {
-                if (count>0)
-                {
-                    info[4].SetActive(false);
-                    info[1].SetActive(true);
-                    Color color = rLight.color;
-                    color.a = 1-((1/ 256f) * count);
-                    rLight.color = color;
-                    People.volume = 1 - ((1 / 256f) * count);
-                    count--;
-                }
-                else
-                {
-                    change = false;
-                    Color c = rSea.color;
-                    c.a = 255;
-                    rSea.color = c;
-                    info[5].SetActive(true);
-                    lCount = 0;
-                    Stage = "Light";
-                }
-            }
-        }
-        else if (Stage=="Light")
-        {
-            if (!change)
-            {
-                if (Input.GetKey(KeyCode.W)||(tMove.text == "CloseLight")) //CloseLight
-                {
-                    bLight = false;
-                }
-                else
-                {
-                    bLight = true;
-                }
-                Light(bLight);
-
-                if (rLight.color.a == 0)
-                {
-                    if (count < 256)
-                    {
-                        count++;
-                        ds.volume = vSea(1 - ((1 / 256f) * count));
-                        People.volume = (1 - ((1 / 256f) * count));
-
-                    }
-                    else if (count >= 256)
-                    {
-                        ds.volume = vSea(0);
-                        itro.volume = 0;
-                        ready.volume = 0;
-                        itro.Play();
-                        ready.Play();
-                        change = true;
-                    }
-                }
-                else
-                {
-                    if (count > 0)
-                    {
-                        count--;
-                        ds.volume = vSea(1 - ((1 / 256f) * count));
-                        People.volume = (1 - ((1 / 256f) * count));
-                    }
+                    change = true;
+                    vSun.frame = 0;
                 }
             }
             else
             {
                 if (count > 0)
                 {
-                    info[5].SetActive(false);
-                    info[2].SetActive(true);
-                    Color color = rSun.color;
-                    color.a = (1 / 256f) * count;
-                    itro.volume = 1-(1 / 256f) * count;
-                    rSun.color = color;
                     count--;
+                    Seagull.volume = 1 - (count / 256f);
                 }
-                else
-                {
-                    info[6].SetActive(true);
-                    lCount = 0;
-                    change = false;
-                    pWind.Play();
-                    Stage = "Wind";
-                }
-
             }
         }
-        else if (Stage == "Wind")
+        else
         {
-            if (!change)
+            if (count > 0)
             {
-                if (itro.isPlaying == false)
-                {
-                    itro.Play();
-                    ready.Play();
-                }
-                if (lCount < 768)
-                {
-                    lCount++;
-                }
-                else
-                {
-                    info[6].SetActive(false);
-                    info[7].SetActive(true);
-                }
-                if (Input.GetKey(KeyCode.D) || (tMove.text == "WindRight")) //WindRight
-                {
-                    Wind(1);
-                }
-                else if (Input.GetKey(KeyCode.A) || (tMove.text == "WindLeft")) //WindLeft
-                {
-                    Wind(-1);
-                }
-                else if ((Input.GetKey(KeyCode.W) || (tMove.text == "Pray")) && (Mathf.Abs(Camera.position.x) < 10) && (info[7].active==true)) //Pray
-                {
-                    count += 1;
-                    if (count < 256)
-                    {
-                        count++;
-                    }
-                    else
-                    {
-                        info[7].SetActive(false);
-                        info[9].SetActive(true);
-                        change = true;
-                    }
-                }
-                else
-                {
-                    if (count > 0)
-                    {
-                        count--;
-                    }
-                    Wind(0);
-                }
+                stepDisplay.Hide();
+                info[1].SetActive(true);
+                Color color = rLight.color;
+                color.a = 1 - ((1 / 256f) * count);
+                rLight.color = color;
+                People.volume = 1 - ((1 / 256f) * count);
+                count--;
             }
             else
             {
-                if (ready.isPlaying == true)
-                {
-                    ready.volume = 1;
-                    itro.volume = 0;
-                }
-                else
-                {
-                    if (bt.isPlaying == false)
-                    {
-                        pWind.Stop();
-                        bt.Play();
-                        bt.volume = 1;
-                    }
-                    if (count > 0)
-                    {
-                        info[3].SetActive(true);
-                        info[9].SetActive(false);
-                        Color color = rSea.color;
-                        color.a = 0.6f + ((1 / 256f) * count) * 0.4f;
-                        rSea.color = color;
-                        count--;
-                    }
-                    else
-                    {
-                        change = false;
-                        info[8].SetActive(true);
-                        Stage = "BlueTear";
-                        
-                    }
-                }
+                change = false;
+                Color c = rSea.color;
+                c.a = 255;
+                rSea.color = c;
+                stepDisplay.Show("右手置於胸前，手心面對畫作，握拳緩緩關閉燈塔");
+                lCount = 0;
+                Stage = "Light";
             }
         }
-        else if (Stage == "BlueTear")
+    }
+
+    void HandleLightStage()
+    {
+        if (!change)
         {
-            if (!change)
+            if (Input.GetKey(KeyCode.W) || (tMove.text == "CloseLight")) // CloseLight
             {
-                if (Input.GetKey(KeyCode.W) || (tMove.text == "WindForward"))//WindForward
-                {
-                    BlueTear(true);
-                }
-                else
-                {
-                    BlueTear(false);
-                }
-                if (count < 2300)
+                bLight = false;
+            }
+            else
+            {
+                bLight = true;
+            }
+            Light(bLight);
+
+            if (rLight.color.a == 0)
+            {
+                if (count < 256)
                 {
                     count++;
+                    ds.volume = vSea(1 - ((1 / 256f) * count));
+                    People.volume = (1 - ((1 / 256f) * count));
                 }
-                else
+                else if (count >= 256)
                 {
+                    ds.volume = vSea(0);
+                    itro.volume = 0;
+                    ready.volume = 0;
+                    itro.Play();
+                    ready.Play();
                     change = true;
                 }
             }
@@ -299,22 +191,181 @@ public class video : MonoBehaviour
             {
                 if (count > 0)
                 {
-                    info[8].SetActive(false);
-                    BlueTear(false);
-                    Color color = rSun.color;
-                    color.a = 1f - (count / 1000f);
-                    rSun.color = color;
-                    count -= 5;
+                    count--;
+                    ds.volume = vSea(1 - ((1 / 256f) * count));
+                    People.volume = (1 / 256f) * count;
+                }
+            }
+        }
+        else
+        {
+            if (count > 0)
+            {
+                stepDisplay.Hide();
+                info[2].SetActive(true);
+                Color color = rSun.color;
+                color.a = (1 / 256f) * count;
+                itro.volume = 1 - (1 / 256f) * count;
+                rSun.color = color;
+                count--;
+            }
+            else
+            {
+                stepDisplay.Show("南風吹拂之日，右手比讚，誠心祈禱");
+                lCount = 0;
+                change = false;
+                pWind.Play();
+                Stage = "Wind";
+            }
+        }
+    }
+
+    void HandleWindStage()
+    {
+        if (!change)
+        {
+            if (itro.isPlaying == false)
+            {
+                itro.Play();
+                ready.Play();
+            }
+            if (lCount < 768)
+            {
+                lCount++;
+            }
+            if (Input.GetKey(KeyCode.D) || (tMove.text == "WindRight")) // WindRight
+            {
+                Wind(1);
+            }
+            else if (Input.GetKey(KeyCode.A) || (tMove.text == "WindLeft")) // WindLeft
+            {
+                Wind(-1);
+            }
+            else if ((Input.GetKey(KeyCode.W) || (tMove.text == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
+            {
+                count += 1;
+                if (count < 256)
+                {
+                    count++;
                 }
                 else
                 {
-                    info[0].SetActive(true);
+                    
+                    change = true;
+                }
+            }
+            else
+            {
+                if (count > 0)
+                {
+                    count--;
+                }
+                Wind(0);
+            }
+        }
+        else
+        {
+            if (ready.isPlaying == true)
+            {
+                ready.volume = 1;
+                itro.volume = 0;
+            }
+            else
+            {
+                if (bt.isPlaying == false)
+                {
+                    pWind.Stop();
+                    bt.Play();
+                    bt.volume = 1;
+                }
+                if (count > 0)
+                {
+                    info[3].SetActive(true);
+                    stepDisplay.Hide();
+                    Color color = rSea.color;
+                    color.a = 0.6f + ((1 / 256f) * count) * 0.4f;
+                    rSea.color = color;
+                    count--;
+                }
+                else
+                {
                     change = false;
-                    Stage = "Init";
+                    stepDisplay.Show("右手比 7 ，擁抱碧波蒼茫");
+                    Stage = "BlueTear";
                 }
             }
         }
     }
+
+    void HandleBlueTearStage()
+    {
+        if (!change)
+        {
+            if (Input.GetKey(KeyCode.W) || (tMove.text == "WindForward")) // WindForward
+            {
+                BlueTear(true);
+            }
+            else
+            {
+                BlueTear(false);
+            }
+            if (count < 2300)
+            {
+                count++;
+            }
+            else
+            {
+                change = true;
+            }
+        }
+        else
+        {
+            if (count > 0)
+            {
+                stepDisplay.Hide();
+                BlueTear(false);
+                Color color = rSun.color;
+                color.a = 1f - (count / 1000f);
+                rSun.color = color;
+                count -= 5;
+            }
+            else
+            {
+                info[0].SetActive(true);
+                change = false;
+                Stage = "Init";
+            }
+        }
+    }
+
+    // if idle too long, back to init    
+    private void HandleBackToInit()
+    {
+        if (!Input.anyKey && (tMove.text == "noPose"))
+        {
+            initCounter++;
+        }
+        else
+        {
+            initCounter = 0;
+        }
+
+        if (initCounter > 3600)
+        {
+            fadeController.StartFadeOut();
+        }
+
+        if (Input.GetKey(KeyCode.R))
+        {
+            fadeController.StartFadeOut();
+        }
+    }
+
+    
+
+    #endregion
+    
+    #region Tools
 
     void Sun(int kInt)
     {
@@ -432,5 +483,15 @@ public class video : MonoBehaviour
     float vSea(float v)    {
         return (0.05f) + (v / 0.95f);
     }
+    
+    private void UpdateDebugUI()
+    {
+        tStage.text = Stage.ToString();
+        tcFrame.text = cFrame.ToString();
+        tCount.text = count.ToString();
+        tlCount.text = lCount.ToString();
+    }
+
+    #endregion
 
 }
