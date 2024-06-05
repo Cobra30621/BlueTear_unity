@@ -8,11 +8,12 @@ using UnityEngine.UI;
 
 public class SocketServer : MonoBehaviour
 {
-    public Text mText;
     private TcpListener server;
     private bool isRunning;
     private int Port = 11000;
     private string message, tMsg;
+
+    public video video;
 
     private void Start()
     {
@@ -32,7 +33,7 @@ public class SocketServer : MonoBehaviour
     {
         server.BeginAcceptTcpClient(HandleClientAccepted, server);
         Debug.Log(tMsg);
-        mText.text = tMsg;
+        video.Move = tMsg;
     }
 
     private void HandleClientAccepted(IAsyncResult result)

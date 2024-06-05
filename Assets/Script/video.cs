@@ -13,13 +13,13 @@ public class video : MonoBehaviour
     public AudioSource ds, itro, ready, bt, People, Seagull;
     public VideoPlayer vSun, vLight;
     public RawImage rSun, rLight, rSea, rBlueTear;
-    public string Stage;
+    public string Stage, Move;
     public int cFrame, maxFrame, count, lCount;
     public int initCounter = 0, initNeedCount = 3600; // if idle too long, back to init
     public bool reverse, bLight, change;
     public Transform Camera, iWind;
     public ParticleSystem pWind;
-    public Text tStage, tcFrame, tCount, tlCount, tMove;
+    public Text tStage, tcFrame, tCount, tlCount;
     public GameObject[] info = new GameObject[4];
 
     public StepDisplay stepDisplay;
@@ -50,8 +50,6 @@ public class video : MonoBehaviour
 
     void FixedUpdate()
     {
-        UpdateDebugUI();
-        
         switch (Stage)
         {
             case "Init":
@@ -96,11 +94,11 @@ public class video : MonoBehaviour
     {
         if (!change)
         {
-            if (Input.GetKey(KeyCode.D) || (tMove.text == "SunRight")) // SunRight
+            if (Input.GetKey(KeyCode.D) || (Move == "SunRight")) // SunRight
             {
                 Sun(1);
             }
-            else if (Input.GetKey(KeyCode.A) || (tMove.text == "SunLeft")) // SunLeft
+            else if (Input.GetKey(KeyCode.A) || (Move == "SunLeft")) // SunLeft
             {
                 Sun(-1);
             }
@@ -159,7 +157,7 @@ public class video : MonoBehaviour
     {
         if (!change)
         {
-            if (Input.GetKey(KeyCode.W) || (tMove.text == "CloseLight")) // CloseLight
+            if (Input.GetKey(KeyCode.W) || (Move == "CloseLight")) // CloseLight
             {
                 bLight = false;
             }
@@ -245,7 +243,7 @@ public class video : MonoBehaviour
             }
             else
             {
-                if ((Input.GetKey(KeyCode.W) || (tMove.text == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
+                if ((Input.GetKey(KeyCode.W) || (Move == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
                 {
                     count += 1;
                     if (count < 256)
@@ -268,11 +266,11 @@ public class video : MonoBehaviour
                 }
             }
             
-            if (Input.GetKey(KeyCode.D) || (tMove.text == "WindRight")) // WindRight
+            if (Input.GetKey(KeyCode.D) || (Move == "WindRight")) // WindRight
             {
                 Wind(1);
             }
-            else if (Input.GetKey(KeyCode.A) || (tMove.text == "WindLeft")) // WindLeft
+            else if (Input.GetKey(KeyCode.A) || (Move == "WindLeft")) // WindLeft
             {
                 Wind(-1);
             }
@@ -316,7 +314,7 @@ public class video : MonoBehaviour
     {
         if (!change)
         {
-            if (Input.GetKey(KeyCode.W) || (tMove.text == "WindForward")) // WindForward
+            if (Input.GetKey(KeyCode.W) || (Move == "WindForward")) // WindForward
             {
                 BlueTear(true);
             }
@@ -356,7 +354,7 @@ public class video : MonoBehaviour
     // if idle too long, back to init    
     private void HandleBackToInit()
     {
-        if (!Input.anyKey && (tMove.text == "noPose"))
+        if (!Input.anyKey && (Move == "noPose"))
         {
             initCounter++;
         }
@@ -499,13 +497,7 @@ public class video : MonoBehaviour
         return (0.05f) + (v / 0.95f);
     }
     
-    private void UpdateDebugUI()
-    {
-        tStage.text = Stage.ToString();
-        tcFrame.text = cFrame.ToString();
-        tCount.text = count.ToString();
-        tlCount.text = lCount.ToString();
-    }
+
 
     #endregion
 
