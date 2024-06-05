@@ -39,7 +39,7 @@ public class video : MonoBehaviour
         Stage = "Init";
         itro.Play(); itro.volume = 0;
         ready.Play(); ready.volume = 0;
-        bt.Play(); bt.volume = 0;
+        bt.volume = 0;
         ds.Play(); ds.volume = 0;
         Seagull.Play(); Seagull.volume = 0;
         People.Play(); People.volume = 0;
@@ -87,7 +87,7 @@ public class video : MonoBehaviour
         else
         {
             vSun.playbackSpeed = 0f;
-            stepDisplay.Show("舉起右手比剪刀，控制日落");
+            stepDisplay.Show("將手呈現「剪刀」姿勢，控制日落");
             Stage = "Sun";
         }
     }
@@ -148,7 +148,7 @@ public class video : MonoBehaviour
                 Color c = rSea.color;
                 c.a = 255;
                 rSea.color = c;
-                stepDisplay.Show("右手置於胸前，手心面對畫作，握拳緩緩關閉燈塔");
+                stepDisplay.Show("手心向前，呈現「石頭」姿勢，緩緩關閉燈塔");
                 lCount = 0;
                 Stage = "Light";
             }
@@ -211,13 +211,18 @@ public class video : MonoBehaviour
             }
             else
             {
-                stepDisplay.Show("南風吹拂之日，右手比讚，誠心祈禱");
+                stepDisplay.Show("縱使雲霧繚繞，只要耐心等待，終將煙消雲散");
                 lCount = 0;
                 change = false;
                 pWind.Play();
                 Stage = "Wind";
             }
         }
+    }
+
+    void HandleWindStageWait()
+    {
+        
     }
 
     void HandleWindStage()
@@ -229,10 +234,40 @@ public class video : MonoBehaviour
                 itro.Play();
                 ready.Play();
             }
+            
             if (lCount < 768)
             {
                 lCount++;
+                if(lCount == 767)
+                {
+                    stepDisplay.Show("南風吹拂之日，將手呈現「讚」姿勢，誠心祈禱");
+                }
             }
+            else
+            {
+                if ((Input.GetKey(KeyCode.W) || (tMove.text == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
+                {
+                    count += 1;
+                    if (count < 256)
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                    
+                        change = true;
+                    }
+                }
+                else
+                {
+                    if (count > 0)
+                    {
+                        count--;
+                    }
+                    Wind(0);
+                }
+            }
+            
             if (Input.GetKey(KeyCode.D) || (tMove.text == "WindRight")) // WindRight
             {
                 Wind(1);
@@ -241,27 +276,7 @@ public class video : MonoBehaviour
             {
                 Wind(-1);
             }
-            else if ((Input.GetKey(KeyCode.W) || (tMove.text == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
-            {
-                count += 1;
-                if (count < 256)
-                {
-                    count++;
-                }
-                else
-                {
-                    
-                    change = true;
-                }
-            }
-            else
-            {
-                if (count > 0)
-                {
-                    count--;
-                }
-                Wind(0);
-            }
+            
         }
         else
         {
@@ -290,7 +305,7 @@ public class video : MonoBehaviour
                 else
                 {
                     change = false;
-                    stepDisplay.Show("右手比 7 ，擁抱碧波蒼茫");
+                    stepDisplay.Show("將手呈現「七」姿勢，擁抱碧波蒼茫");
                     Stage = "BlueTear";
                 }
             }

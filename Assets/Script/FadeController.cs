@@ -26,6 +26,7 @@ public class FadeController : MonoBehaviour
     // 淡入協程
     private IEnumerator FadeIn(float duration)
     {
+        yield return new WaitForSeconds(0.2f);
         float startTime = Time.time;
         while (Time.time - startTime < duration)
         {
