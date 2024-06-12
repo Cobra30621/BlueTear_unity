@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 19066052}
   - component: {fileID: 19066053}
   - component: {fileID: 19066054}
+  - component: {fileID: 19066055}
   m_Layer: 5
   m_Name: Step Display
   m_TagString: Untagged
@@ -159,7 +160,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 51.837}
+  m_AnchoredPosition: {x: 0, y: 74}
   m_SizeDelta: {x: 1400, y: 103.674194}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &19066053
@@ -183,9 +184,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infoText: {fileID: 622664435}
-  count: 0
-  wait: 0
-  testInfo: "\u6211\u662F\u4F60\u02CB\u7238\u7238]"
+  _animator: {fileID: 19066055}
+--- !u!95 &19066055
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 19066051}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 942064c627e895d4186ff23a79188f73, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &82818116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1038,7 +1057,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &622664434
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1072,7 +1091,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

@@ -86,7 +86,7 @@ public class video : MonoBehaviour
         else
         {
             vSun.playbackSpeed = 0f;
-            stepDisplay.Show("請比「剪刀」姿勢，控制日落");
+            stepDisplay.Show("請比「剪刀」手勢，控制日落");
             Stage = "Sun";
         }
     }
@@ -147,7 +147,7 @@ public class video : MonoBehaviour
                 Color c = rSea.color;
                 c.a = 255;
                 rSea.color = c;
-                stepDisplay.Show("請比「石頭」姿勢，關閉燈塔");
+                stepDisplay.Show("請比「石頭」手勢，關閉燈塔");
                 lCount = 0;
                 Stage = "Light";
             }
@@ -203,7 +203,7 @@ public class video : MonoBehaviour
             }
             else
             {
-                stepDisplay.Show("請比「讚」姿勢，誠心祈禱");
+                stepDisplay.Show("請比「讚」手勢，誠心祈禱");
                 lCount = 0;
                 change = false;
                 pWind.Play();
@@ -275,7 +275,7 @@ public class video : MonoBehaviour
             else
             {
                 change = false;
-                stepDisplay.Show("將手呈現「七」姿勢，擁抱碧波蒼茫");
+                stepDisplay.Show("請比「七」手勢，放大畫面");
                 Stage = "BlueTear";
             }
         }
