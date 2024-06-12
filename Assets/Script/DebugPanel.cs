@@ -22,6 +22,16 @@ namespace Script
             {
                 mainPanel.SetActive(!mainPanel.activeSelf);
             }
+
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                QuitGame();
+            }
+        }
+
+        public void QuitGame()
+        {
+            Application.Quit();
         }
     }
 }

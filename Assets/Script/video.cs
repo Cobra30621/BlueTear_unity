@@ -10,7 +10,7 @@ using UnityEngine.Serialization;
 
 public class video : MonoBehaviour
 {
-    public AudioSource ds, itro, ready, bt, People, Seagull;
+    public AudioSource ds, itro,  bt, People, Seagull;
     public VideoPlayer vSun, vLight;
     public RawImage rSun, rLight, rSea, rBlueTear;
     public string Stage, Move;
@@ -38,7 +38,6 @@ public class video : MonoBehaviour
         vSun.Play(); vLight.Play();
         Stage = "Init";
         itro.Play(); itro.volume = 0;
-        ready.Play(); ready.volume = 0;
         bt.volume = 0;
         ds.Play(); ds.volume = 0;
         Seagull.Play(); Seagull.volume = 0;
@@ -70,6 +69,8 @@ public class video : MonoBehaviour
         }
 
         HandleBackToInit();
+        
+        
     }
 
     
@@ -85,7 +86,7 @@ public class video : MonoBehaviour
         else
         {
             vSun.playbackSpeed = 0f;
-            stepDisplay.Show("將手呈現「剪刀」姿勢，控制日落");
+            stepDisplay.Show("請比「剪刀」姿勢，控制日落");
             Stage = "Sun";
         }
     }
@@ -146,7 +147,7 @@ public class video : MonoBehaviour
                 Color c = rSea.color;
                 c.a = 255;
                 rSea.color = c;
-                stepDisplay.Show("手心向前，呈現「石頭」姿勢，緩緩關閉燈塔");
+                stepDisplay.Show("請比「石頭」姿勢，關閉燈塔");
                 lCount = 0;
                 Stage = "Light";
             }
@@ -167,23 +168,16 @@ public class video : MonoBehaviour
             }
             Light(bLight);
 
+            ds.volume = vSea(1 - ((1 / 256f) * lCount));
+            People.volume = (1 - ((1 / 256f) * lCount));
+            
             if (rLight.color.a == 0)
             {
-                if (count < 256)
-                {
-                    count++;
-                    ds.volume = vSea(1 - ((1 / 256f) * count));
-                    People.volume = (1 - ((1 / 256f) * count));
-                }
-                else if (count >= 256)
-                {
-                    ds.volume = vSea(0);
-                    itro.volume = 0;
-                    ready.volume = 0;
-                    itro.Play();
-                    ready.Play();
-                    change = true;
-                }
+                ds.volume = vSea(0);
+                itro.volume = 0;
+                itro.Play();
+                count = 255;
+                change = true;
             }
             else
             {
@@ -209,7 +203,7 @@ public class video : MonoBehaviour
             }
             else
             {
-                stepDisplay.Show("縱使雲霧繚繞，只要耐心等待，終將煙消雲散");
+                stepDisplay.Show("請比「讚」姿勢，誠心祈禱");
                 lCount = 0;
                 change = false;
                 pWind.Play();
@@ -217,12 +211,7 @@ public class video : MonoBehaviour
             }
         }
     }
-
-    void HandleWindStageWait()
-    {
-        
-    }
-
+    
     void HandleWindStage()
     {
         if (!change)
@@ -230,41 +219,30 @@ public class video : MonoBehaviour
             if (itro.isPlaying == false)
             {
                 itro.Play();
-                ready.Play();
             }
             
-            if (lCount < 768)
+            if ((Input.GetKey(KeyCode.W) || (Move == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
             {
-                lCount++;
-                if(lCount == 767)
+                count += 1;
+                if (count < 500)
                 {
-                    stepDisplay.Show("南風吹拂之日，將手呈現「讚」姿勢，誠心祈禱");
+                    count++;
+                }
+                else
+                {
+                    count = 256;
+                    change = true;
                 }
             }
             else
             {
-                if ((Input.GetKey(KeyCode.W) || (Move == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
+                if (count > 0)
                 {
-                    count += 1;
-                    if (count < 256)
-                    {
-                        count++;
-                    }
-                    else
-                    {
-                    
-                        change = true;
-                    }
+                    count--;
                 }
-                else
-                {
-                    if (count > 0)
-                    {
-                        count--;
-                    }
-                    Wind(0);
-                }
+                Wind(0);
             }
+        
             
             if (Input.GetKey(KeyCode.D) || (Move == "WindRight")) // WindRight
             {
@@ -278,34 +256,27 @@ public class video : MonoBehaviour
         }
         else
         {
-            if (ready.isPlaying == true)
+            itro.volume = 0;
+            if (bt.isPlaying == false)
             {
-                ready.volume = 1;
-                itro.volume = 0;
+                pWind.Stop();
+                bt.Play();
+                bt.volume = 1;
+            }
+            if (count > 0)
+            {
+                info[3].SetActive(true);
+                stepDisplay.Hide();
+                Color color = rSea.color;
+                color.a = 0.6f + ((1 / 256f) * count) * 0.4f;
+                rSea.color = color;
+                count--;
             }
             else
             {
-                if (bt.isPlaying == false)
-                {
-                    pWind.Stop();
-                    bt.Play();
-                    bt.volume = 1;
-                }
-                if (count > 0)
-                {
-                    info[3].SetActive(true);
-                    stepDisplay.Hide();
-                    Color color = rSea.color;
-                    color.a = 0.6f + ((1 / 256f) * count) * 0.4f;
-                    rSea.color = color;
-                    count--;
-                }
-                else
-                {
-                    change = false;
-                    stepDisplay.Show("將手呈現「七」姿勢，擁抱碧波蒼茫");
-                    Stage = "BlueTear";
-                }
+                change = false;
+                stepDisplay.Show("將手呈現「七」姿勢，擁抱碧波蒼茫");
+                Stage = "BlueTear";
             }
         }
     }
