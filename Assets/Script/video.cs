@@ -111,7 +111,7 @@ public class video : MonoBehaviour
             {
                 if (count < 256)
                 {
-                    count++;
+                    count += 2;
                     Seagull.volume = 1 - (count / 256f);
                 }
                 else if (count >= 256)
@@ -176,14 +176,14 @@ public class video : MonoBehaviour
                 ds.volume = vSea(0);
                 itro.volume = 0;
                 itro.Play();
-                count = 255;
+                count = 350;
                 change = true;
             }
             else
             {
                 if (count > 0)
                 {
-                    count--;
+                    count -= 2;
                     ds.volume = vSea(1 - ((1 / 256f) * count));
                     People.volume = (1 / 256f) * count;
                 }
@@ -193,12 +193,16 @@ public class video : MonoBehaviour
         {
             if (count > 0)
             {
-                stepDisplay.Hide();
-                info[2].SetActive(true);
-                Color color = rSun.color;
-                color.a = (1 / 256f) * count;
-                itro.volume = 1 - (1 / 256f) * count;
-                rSun.color = color;
+                if (count < 255)
+                {
+                    stepDisplay.Hide();
+                    info[2].SetActive(true);
+                    Color color = rSun.color;
+                    color.a = (1 / 256f) * count;
+                    itro.volume = 1 - (1 / 256f) * count;
+                    rSun.color = color;
+                }
+                
                 count--;
             }
             else
