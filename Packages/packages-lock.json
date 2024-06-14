@@ -126,6 +126,12 @@
       },
       "url": "https://packages.unity.com"
     },
+    "io.sentry.unity": {
+      "version": "file:io.sentry.unity",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
