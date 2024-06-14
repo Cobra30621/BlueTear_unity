@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -12,29 +13,67 @@ public class SocketServer : MonoBehaviour
     private bool isRunning;
     private int Port = 11000;
     private string message, tMsg;
+    
+    private static bool isConnected;
 
-    public video video;
+    private static SocketServer instance;
+
+    private bool isAcceptingClients;
 
     private void Start()
     {
-        IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
-        server = new TcpListener(ipAddress, Port);
-        server.Start();
-        tMsg = "noPose";
-        isRunning = true;
-
-        SceneManager.sceneLoaded += (s, e) =>
+        if (instance == null)
         {
-            StopServer();
-        };
+            instance = this;
+            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
+            server = new TcpListener(ipAddress, Port);
+            StartCoroutine(StartServer());
+            tMsg = "noPose";
+            isRunning = true;
+            
+            DontDestroyOnLoad(this);
+        }
+        else
+        {
+            Destroy(this);
+        }
+    }
+
+    private IEnumerator StartServer()
+    {
+        while (true)
+        {
+            try
+            {
+                server.Start();
+                isAcceptingClients = true;
+                yield break; // 成功後退出協程
+            }
+            catch (SocketException ex)
+            {
+                if (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                {
+                    Debug.LogWarning("Address already in use, retrying in 1 second...");
+                }
+                else
+                {
+                    Debug.LogError($"SocketException: {ex.Message}");
+                    yield break; // 如果是其他異常則退出協程
+                }
+            }
+            yield return new WaitForSeconds(1); // 每隔 1 秒重試一次
+        }
     }
 
     private void FixedUpdate()
     {
-        server.BeginAcceptTcpClient(HandleClientAccepted, server);
-        Debug.Log(tMsg);
+        if (server != null && isAcceptingClients)
+        {
+            server.BeginAcceptTcpClient(HandleClientAccepted, server);
+        }
         video.Move = tMsg;
     }
+
 
     private void HandleClientAccepted(IAsyncResult result)
     {
@@ -50,7 +89,12 @@ public class SocketServer : MonoBehaviour
             stream.Write(response, 0, response.Length);
             if (message != "")
             {
+                isConnected = true;
                 tMsg = message;
+            }
+            else
+            {
+                isConnected = false;
             }
         }
     }
@@ -58,6 +102,11 @@ public class SocketServer : MonoBehaviour
     private void OnApplicationQuit()
     {
         StopServer();
+    }
+
+    public static bool IsConnected()
+    {
+        return isConnected;
     }
 
     private void StopServer()

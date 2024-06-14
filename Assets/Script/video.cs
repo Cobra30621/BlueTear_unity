@@ -13,7 +13,8 @@ public class video : MonoBehaviour
     public AudioSource ds, itro,  bt, People, Seagull;
     public VideoPlayer vSun, vLight;
     public RawImage rSun, rLight, rSea, rBlueTear;
-    public string Stage, Move;
+    public string Stage;
+    public static string Move;
     public int cFrame, maxFrame, count, lCount;
     public int initCounter = 0, initNeedCount = 3600; // if idle too long, back to init
     public bool reverse, bLight, change;
@@ -336,13 +337,18 @@ public class video : MonoBehaviour
             initCounter = 0;
         }
 
-        if (initCounter > 3600 * 5)
+        if (initCounter == 360)
         {
-            if(Stage != "Sun")
-                fadeController.StartFadeOut();
+            fadeController.StartFadeOut();
+            // if (Stage != "Sun")
+            // {
+            //     initCounter = 0;
+            //     fadeController.StartFadeOut();
+            // }
+                
         }
 
-        if (Input.GetKey(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             fadeController.StartFadeOut();
         }

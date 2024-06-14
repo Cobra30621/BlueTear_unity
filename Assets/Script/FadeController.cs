@@ -20,6 +20,7 @@ public class FadeController : MonoBehaviour
     // 調用此方法來觸發淡出
     public void StartFadeOut()
     {
+        Debug.Log("StartFadeOut");
         StartCoroutine(FadeOut(1f));
     }
 

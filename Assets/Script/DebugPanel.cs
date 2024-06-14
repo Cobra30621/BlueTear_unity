@@ -6,8 +6,8 @@ namespace Script
     public class DebugPanel : MonoBehaviour
     {
         public GameObject mainPanel;
-        public Text tStage, tcFrame, tCount, tlCount, tMove;
-
+        public Text tStage, tcFrame, tCount, tlCount, tMove, connected;
+   
         public video video;
         
         void Update()
@@ -17,6 +17,7 @@ namespace Script
             tcFrame.text = video.cFrame.ToString();
             tCount.text = video.count.ToString();
             tlCount.text = video.lCount.ToString();
+            connected.text = SocketServer.IsConnected() ? "連線成功" : "尚未連線";
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
