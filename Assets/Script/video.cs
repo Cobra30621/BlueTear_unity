@@ -69,11 +69,9 @@ public class video : MonoBehaviour
         }
 
         HandleBackToInit();
-        
-        
     }
 
-    
+
 
     void HandleInitStage()
     {
@@ -111,7 +109,7 @@ public class video : MonoBehaviour
             {
                 if (count < 256)
                 {
-                    count += 2;
+                    count += 4;
                     Seagull.volume = 1 - (count / 256f);
                 }
                 else if (count >= 256)
@@ -228,7 +226,7 @@ public class video : MonoBehaviour
             if ((Input.GetKey(KeyCode.W) || (Move == "Pray")) && (Mathf.Abs(Camera.position.x) < 10)) // Pray
             {
                 count += 1;
-                if (count < 500)
+                if (count < 350)
                 {
                     count++;
                 }
@@ -338,9 +336,10 @@ public class video : MonoBehaviour
             initCounter = 0;
         }
 
-        if (initCounter > 3600)
+        if (initCounter > 3600 * 5)
         {
-            fadeController.StartFadeOut();
+            if(Stage != "Sun")
+                fadeController.StartFadeOut();
         }
 
         if (Input.GetKey(KeyCode.R))
@@ -414,7 +413,7 @@ public class video : MonoBehaviour
         }
         else
         {
-            lCount++;
+            lCount += 2;
         }
         lCount = Mathf.Clamp(lCount, 0, 255);
         cLight.a = 1-(lCount / 255f);
