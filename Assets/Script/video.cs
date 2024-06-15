@@ -30,7 +30,7 @@ public class video : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        vSun.frame = 0;
+        vSun.Stop();
         maxFrame = 599;
         count = 0; lCount = 0;
         reverse = false; bLight = false; change = false;
@@ -116,7 +116,7 @@ public class video : MonoBehaviour
                 else if (count >= 256)
                 {
                     change = true;
-                    vSun.frame = 0;
+                    vSun.Stop();
                 }
             }
             else
@@ -239,10 +239,6 @@ public class video : MonoBehaviour
             }
             else
             {
-                if (count > 0)
-                {
-                    count--;
-                }
                 Wind(0);
             }
         
@@ -321,6 +317,7 @@ public class video : MonoBehaviour
                 info[0].SetActive(true);
                 change = false;
                 Stage = "Init";
+                vSun.Play();
             }
         }
     }
@@ -328,7 +325,7 @@ public class video : MonoBehaviour
     // if idle too long, back to init    
     private void HandleBackToInit()
     {
-        if (!Input.anyKey && (Move == "noPose"))
+        if (!Input.anyKey && (Move == "noPose") && Stage != "Sun")
         {
             initCounter++;
         }
@@ -336,16 +333,11 @@ public class video : MonoBehaviour
         {
             initCounter = 0;
         }
-
-        if (initCounter == 360)
+        
+        if (initCounter == 3600 * 5)
         {
+            initCounter = 0;
             fadeController.StartFadeOut();
-            // if (Stage != "Sun")
-            // {
-            //     initCounter = 0;
-            //     fadeController.StartFadeOut();
-            // }
-                
         }
 
         if (Input.GetKeyDown(KeyCode.R))

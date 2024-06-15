@@ -12,7 +12,8 @@ public class SocketServer : MonoBehaviour
     private TcpListener server;
     private bool isRunning;
     private int Port = 11000;
-    private string message, tMsg;
+    private string message;
+    private static string tMsg;
     
     private static bool isConnected;
 
@@ -107,6 +108,11 @@ public class SocketServer : MonoBehaviour
     public static bool IsConnected()
     {
         return isConnected;
+    }
+
+    public static bool IsCaptureCamera()
+    {
+        return tMsg != "NotCaptureCamera";
     }
 
     private void StopServer()
