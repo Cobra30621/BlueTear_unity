@@ -3,6 +3,9 @@ using UnityEngine.Serialization;
 
 namespace Script
 {
+    /// <summary>
+    /// This class is responsible for controlling all audio sources in the game.
+    /// </summary>
     public class AudioController : MonoBehaviour
     {
         public AudioSource[] audioSources;

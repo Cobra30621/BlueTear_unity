@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 namespace Script
 {
+    /// <summary>
+    /// 不同步驟提示文字
+    /// </summary>
     public class StepDisplay : MonoBehaviour
     {
         public Text infoText;
