@@ -10,9 +10,10 @@ namespace Script
     /// </summary>
     public class GameProcess : MonoBehaviour
     {
-        public AudioSource ds, itro,  bt, People, Seagull;
-        public VideoPlayer vSun, vLight;
-        public RawImage rSun, rLight, rSea, rBlueTear;
+        public AudioSource ds, itro, bt;
+        public AudioSource  People, Seagull; // Loop Audio
+        public SunPlayer sunPlayer;
+        public RawImage rSun, rLight, rSea;
         
         /// <summary>
         /// 表示現在在哪個場景
@@ -34,8 +35,8 @@ namespace Script
         public int reloadCount = 0;
         public int reloadNeedCount = 3600 * 5; 
         
-        public int sunFrame, maxFrame;
-        public bool reverse, bLight, change;
+        public int sunFrame;
+        public bool bLight, change;
         
         public Transform Camera, iWind;
         public ParticleSystem pWind;
@@ -48,7 +49,9 @@ namespace Script
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            maxFrame = 599;
+            
+            Seagull.Play();
+            People.Play();
             
             InitGame();
         }
@@ -59,17 +62,16 @@ namespace Script
         private void InitGame()
         {
             count = 0; lightCount = 0;
-            reverse = false; bLight = false; change = false;
-            vSun.enabled = true; vLight.enabled = true;
-            vSun.playbackSpeed = 1f; vLight.playbackSpeed = 1f;
-            vSun.Stop(); vSun.Play(); vLight.Play();
+            bLight = false; change = false;
+            sunPlayer.PlayAtFirstFrame();
             
             Stage = "Init";
             itro.Play(); itro.volume = 0;
-            bt.volume = 0;
             ds.Play(); ds.volume = 0;
-            Seagull.Play(); Seagull.volume = 0;
-            People.Play(); People.volume = 0;
+            bt.volume = 0;
+            Seagull.volume = 0;
+            People.volume = 0;
+            
             pWind.Stop();
         }
 
@@ -105,15 +107,17 @@ namespace Script
         /// </summary>
         void HandleInitStage()
         {
-            if (vSun.frame <= 150)
+            if (sunPlayer.GetSunState() == SunState.SunRising)
             {
-                ds.volume = vSun.frame / 150f;
-                Seagull.volume = vSun.frame / 150f;
-                vSun.playbackSpeed = 1f;
+                sunFrame = sunPlayer.GetFrame();
+                ds.volume = sunFrame / 150f;
+                Seagull.volume = sunFrame / 150f;
+                
+                sunPlayer.Resume();
             }
             else
             {
-                vSun.playbackSpeed = 0f;
+                sunPlayer.Pause();
                 stepDisplay.Show("請比「剪刀」手勢，控制日落");
                 Stage = "Sun";
             }
@@ -124,21 +128,20 @@ namespace Script
         /// </summary>
         void HandleSunStage()
         {
+            sunFrame = sunPlayer.GetFrame();
+            
             if (!change)
             {
                 if (Input.GetKey(KeyCode.D) || (HandPose == "SunRight")) // SunRight
                 {
-                    Sun(1);
-                }
-                else if (Input.GetKey(KeyCode.A) || (HandPose == "SunLeft")) // SunLeft
-                {
-                    Sun(-1);
+                    sunPlayer.PlaySunSet();
                 }
                 else
                 {
-                    Sun(0);
+                    sunPlayer.Pause();
                 }
-                if (vSun.frame == 299 || vSun.frame == 300)
+                
+                if (sunPlayer.GetSunState() == SunState.IsNight)
                 {
                     if (count < 256)
                     {
@@ -148,7 +151,7 @@ namespace Script
                     else if (count >= 256)
                     {
                         change = true;
-                        vSun.Stop();
+                        sunPlayer.Pause();
                     }
                 }
                 else
@@ -394,57 +397,7 @@ namespace Script
         #endregion
     
         #region Tools
-
-        void Sun(int kInt)
-        {
-            sunFrame = (int)vSun.frame;
-            if (kInt==1)
-            {
-                if (reverse)
-                { 
-                    vSun.frame = maxFrame - sunFrame;
-                
-                    reverse = false;
-                }
-
-                if ((sunFrame<0) || (sunFrame >= 299))
-                {
-                    vSun.playbackSpeed = 0f;
-                }
-                else
-                {
-                    vSun.playbackSpeed = 1f;
-                }
-            
-            }
-            else if (kInt==-1)
-            {
-                if (!reverse)
-                {
-                    vSun.frame = maxFrame - sunFrame;
-                
-                    reverse = true;
-                }
-                if ((sunFrame < 299) || (sunFrame >= 600))
-                {
-                    vSun.playbackSpeed = 0f;
-                }
-                else
-                {
-                    vSun.playbackSpeed = 1f;
-                }
-
-            }
-            else if (kInt==0)
-            {
-                vSun.playbackSpeed = 0f;
-            }
-            else if (kInt == 2)
-            {
-                vSun.frame = 0;
-            }
         
-        }
         void Light(bool open)
         {
             Color cLight = rLight.color;
