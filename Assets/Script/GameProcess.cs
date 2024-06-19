@@ -14,6 +14,8 @@ namespace Script
         public AudioSource  People, Seagull; // Loop Audio
         public SunPlayer sunPlayer;
         public RawImage rSun, rLight, rSea;
+
+        public VideoPlayerSetting videoPlayerSetting;
         
         /// <summary>
         /// 表示現在在哪個場景
@@ -33,7 +35,7 @@ namespace Script
         /// </summary>
         public int lightCount;
         public int reloadCount = 0;
-        public int reloadNeedCount = 3600 * 5; 
+        public int reloadNeedSeconds = 180; 
         
         public int sunFrame;
         public bool bLight, change;
@@ -68,11 +70,15 @@ namespace Script
             Stage = "Init";
             itro.Play(); itro.volume = 0;
             ds.Play(); ds.volume = 0;
-            bt.volume = 0;
+
             Seagull.volume = 0;
             People.volume = 0;
             
             pWind.Stop();
+            
+            videoPlayerSetting.StopVideo(VideoName.Light);
+            videoPlayerSetting.StopVideo(VideoName.BlueTear);
+            videoPlayerSetting.StopVideo(VideoName.Wave);
         }
 
         #region Stage Handle
@@ -113,7 +119,7 @@ namespace Script
                 ds.volume = sunFrame / 150f;
                 Seagull.volume = sunFrame / 150f;
                 
-                sunPlayer.Resume();
+                sunPlayer.SetPlaySpeed(1);
             }
             else
             {
@@ -138,7 +144,7 @@ namespace Script
                 }
                 else
                 {
-                    sunPlayer.Pause();
+                    sunPlayer.SetPlaySpeed(0);
                 }
                 
                 if (sunPlayer.GetSunState() == SunState.IsNight)
@@ -151,7 +157,8 @@ namespace Script
                     else if (count >= 256)
                     {
                         change = true;
-                        sunPlayer.Pause();
+                        sunPlayer.SetPlaySpeed(0);
+                        videoPlayerSetting.PlayVideo(VideoName.Light);
                     }
                 }
                 else
@@ -215,6 +222,9 @@ namespace Script
                     itro.Play();
                     count = 350;
                     change = true;
+                    
+                    videoPlayerSetting.PlayVideo(VideoName.BlueTear);
+                    videoPlayerSetting.PlayVideo(VideoName.Wave);
                 }
                 else
                 {
@@ -380,7 +390,7 @@ namespace Script
                 reloadCount = 0;
             }
         
-            if (reloadCount == reloadNeedCount)
+            if (reloadCount == reloadNeedSeconds * 3600)
             {
                 reloadCount = 0;
                 fadeController.StartFadeOut();

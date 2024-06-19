@@ -46,5 +46,11 @@ namespace Script
         {
             Application.Quit();
         }
+        
+        
+        private void OnApplicationQuit()
+        {
+            Debug.Log($"App quit : {Time.time}, {GameProcess.HandPose}, {gameProcess.Stage}");
+        }
     }
 }

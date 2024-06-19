@@ -1059,6 +1059,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 710504127}
+  - component: {fileID: 710504128}
   m_Layer: 0
   m_Name: Videos
   m_TagString: Untagged
@@ -1085,6 +1086,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &710504128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710504126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fbabdf7680441ddae5edd97e9468caf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  videoPlayers:
+  - {fileID: 1281669885}
+  - {fileID: 1057372183}
+  - {fileID: 474052482}
+  - {fileID: 260657256}
 --- !u!1 &735840653
 GameObject:
   m_ObjectHideFlags: 0
@@ -7984,11 +8002,12 @@ MonoBehaviour:
   rSun: {fileID: 1023436954}
   rLight: {fileID: 2045445580}
   rSea: {fileID: 2122662860}
+  videoPlayerSetting: {fileID: 710504128}
   Stage: 
   count: 0
   lightCount: 0
   reloadCount: 0
-  reloadNeedCount: 18000
+  reloadNeedCount: 10800
   sunFrame: 0
   bLight: 0
   change: 0

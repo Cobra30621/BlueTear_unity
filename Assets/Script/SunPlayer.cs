@@ -11,6 +11,9 @@ namespace Script
         IsNight // 已經夜晚了 299
     }
     
+    /// <summary>
+    /// 負責處理太陽的影片撥放
+    /// </summary>
     public class SunPlayer : MonoBehaviour
     {
         public VideoPlayer vSun;
@@ -37,11 +40,16 @@ namespace Script
         {
             if (GetSunState() == SunState.SunSetting)
             {
-                Resume();
+                if (!vSun.isPlaying)
+                {
+                    vSun.Play();
+                }
+                
+                SetPlaySpeed(1);
             }
             else
             {
-                Pause();
+                SetPlaySpeed(0);
             }
         }
         
@@ -53,12 +61,13 @@ namespace Script
 
         public void Pause()
         {
-            vSun.playbackSpeed = 0f;
+            vSun.Pause();
         }
         
-        public void Resume()
+        public void SetPlaySpeed(int speed)
         {
-            vSun.playbackSpeed = 1f;
+            vSun.playbackSpeed = speed;
         }
+        
     }
 }
