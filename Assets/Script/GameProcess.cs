@@ -390,7 +390,7 @@ namespace Script
                 reloadCount = 0;
             }
         
-            if (reloadCount == reloadNeedSeconds * 3600)
+            if (reloadCount == reloadNeedSeconds * 60)
             {
                 reloadCount = 0;
                 fadeController.StartFadeOut();

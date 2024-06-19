@@ -8007,7 +8007,7 @@ MonoBehaviour:
   count: 0
   lightCount: 0
   reloadCount: 0
-  reloadNeedCount: 10800
+  reloadNeedSeconds: 90
   sunFrame: 0
   bLight: 0
   change: 0
