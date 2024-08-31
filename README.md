@@ -2,6 +2,11 @@
 
 - [總交接文件目錄](https://hackmd.io/bshavgPmR7iQqVW_mfMg6Q)
 
+Cilab 與曹松清畫家合作設計出以馬祖藍眼淚為主題的互動式畫展，畫作內可以以手勢來控制畫作的光影變化隨時欣賞藍眼淚的奇異美景
+
+- [Demo 影片](https://www.youtube.com/watch?v=u5FYUrtseUc)
+
+
 ## Set up
 
 - Unity 版本 2021.3.18f1
